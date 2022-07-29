@@ -1,0 +1,108 @@
+.pagination>li>a {
+    background-color: 22212c;
+    color: white;
+}
+
+.pagination>li>a:focus,
+.pagination>li>a:hover,
+.pagination>li>span:focus,
+.pagination>li>span:hover {
+    color: #5a5a5a;
+    background-color: #eee;
+    border-color: #ddd;
+}
+
+.pagination>.active>a {
+    color: white;
+    background-color: #653ea3 !Important;
+    border: solid 1px white !Important;
+}
+
+.pagination>.active>a:hover {
+    background-color: #b69edd !Important;
+    border: solid 1px white !Important;
+    color: white
+}
+
+body {
+    background-color: #22212c;
+}
+
+.fa-sort {
+    /* background-color: #22212c !important; */
+    background-color: transparent !important;
+    border: 0px;
+}
+
+.fa-sort-up {
+    /* background-color: #22212c !important; */
+    background-color: transparent !important;
+    border: 0px;
+}
+
+.fa-sort-down {
+    background-color: transparent !important;
+    border: 0px;
+}
+
+.fa-minus {
+    background-color: transparent !important;
+    border: 0px;
+}
+
+.fa-solid {
+    color: #ffffff !important;
+}
+
+.tooltip {
+    display: none;
+}
+
+.show:hover>.tooltip {
+    display: block;
+}
+
+/* th:first-of-type {
+    border-top-left-radius: 10px !important;
+}
+th:last-of-type {
+    border-top-right-radius: 10px !important;
+}
+tr:last-of-type td:first-of-type {
+    border-bottom-left-radius: 10px !important;
+}
+tr:last-of-type td:last-of-type {
+    border-bottom-right-radius: 10px !important;
+}
+*/
+.no-border {
+    border-bottom-color: #22212c;
+    background-color: #323539;
+}
+
+/* scroll bar */
+::-webkit-scrollbar {
+    width: 1px;
+    height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 2px grey;
+    border-radius: 2px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #403e4e;
+    border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #403e4e;
+}
+
+table {
+    scrollbar-width: 3px;
+}
