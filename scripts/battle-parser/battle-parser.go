@@ -19,7 +19,6 @@ import (
 	"github.com/malaow3/trunk"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
-	"golang.org/x/exp/slices"
 )
 
 func getAssertion(config *config.Config, challstr string) (string, error) {
@@ -74,6 +73,16 @@ type BattleParticipant struct {
 	RatingBefore string
 	RatingAfter  string
 	SelectedMons []string
+}
+
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+
+	_, ok := set[item]
+	return ok
 }
 
 func login(cfg *config.Config) ([]*http.Cookie, error) {
@@ -178,7 +187,7 @@ func upload_battle(cfg *config.Config, battle_inst *Battle) error {
 	opponent_team_string := strings.Join(battle_inst.Opponent.SelectedMons, ",")
 	// add the remaining pokemon from FullTeam to your_team_string
 	for _, mon := range battle_inst.Player.FullTeam {
-		if !slices.Contains(battle_inst.Player.SelectedMons, mon) {
+		if !contains(battle_inst.Player.SelectedMons, mon) {
 			mon = strings.TrimSuffix(mon, "-*")
 			your_team_string += "," + mon
 		}
@@ -192,7 +201,7 @@ func upload_battle(cfg *config.Config, battle_inst *Battle) error {
 	}
 
 	for _, mon := range battle_inst.Opponent.FullTeam {
-		if !slices.Contains(battle_inst.Opponent.SelectedMons, mon) {
+		if !contains(battle_inst.Opponent.SelectedMons, mon) {
 			mon = strings.TrimSuffix(mon, "-*")
 			opponent_team_string += "," + mon
 		}
@@ -420,7 +429,7 @@ func Parse_battles() {
 				poke_name := groups[2]
 				if player_num == "p1" {
 					// if pokemon is already in selected mons, skip
-					if slices.Contains(battles[battle_id].P1.SelectedMons, poke_name) {
+					if contains(battles[battle_id].P1.SelectedMons, poke_name) {
 						continue
 					}
 					battles[battle_id].P1.SelectedMons = append(battles[battle_id].P1.SelectedMons, poke_name)
@@ -432,7 +441,7 @@ func Parse_battles() {
 						}
 					}
 				} else {
-					if slices.Contains(battles[battle_id].P2.SelectedMons, poke_name) {
+					if contains(battles[battle_id].P2.SelectedMons, poke_name) {
 						continue
 					}
 					battles[battle_id].P2.SelectedMons = append(battles[battle_id].P2.SelectedMons, poke_name)

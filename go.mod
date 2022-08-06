@@ -1,6 +1,6 @@
 module main
 
-go 1.18
+go 1.17
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -9,7 +9,6 @@ require (
 	github.com/malaow3/trunk v0.0.0-20220803001732-e1f7cd921681
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tidwall/gjson v1.14.1
-	golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/sqlite v1.3.6
 	gorm.io/gorm v1.23.8
