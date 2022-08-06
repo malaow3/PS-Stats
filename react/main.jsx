@@ -7,28 +7,6 @@ import BattlesTable from './table.jsx';
 const e = React.createElement;
 const doneTypingInterval = 500; // time in ms, 5 seconds for example
 
-/**
- * Determines whether a string is alphanumeric
- * @param {str} str
- * @return {boolean}
- */
-function isAlphaNumeric(str) {
-    let code; let i; let len;
-
-    for (i = 0, len = str.length; i < len; i++) {
-        code = str.charCodeAt(i);
-        if (
-            !(code > 47 && code < 58) && // numeric (0-9)
-            !(code > 64 && code < 91) && // upper alpha (A-Z)
-            !(code > 96 && code < 123)
-        ) {
-            // lower alpha (a-z)
-            return false;
-        }
-    }
-    return true;
-}
-
 // eslint-disable-next-line require-jsdoc
 function debounce(fn, ms) {
     let timer;
@@ -268,12 +246,6 @@ class Main extends React.Component {
     // check if event is "button" or if it was the enter key
         if (event === 'button' || event.keyCode === 13) {
             const username = document.getElementById('loginUsername').value;
-            // verify that username is alpha-numeric
-            if (!isAlphaNumeric(username)) {
-                alert('Username must be alpha-numeric');
-                return;
-            }
-
             // send POST request to server
             axios
                 .post('api/auth/login', {
