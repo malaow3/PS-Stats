@@ -1,4 +1,4 @@
-run = "go build -o main; ./main"
+run = "dist/linux/PS_STATS"
 hidden = ["Makefile", "main"]
 
 [languages.go]
