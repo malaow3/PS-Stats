@@ -1,6 +1,7 @@
 # PS_STATS
 
 PS_STATS is a match tracking tool for [Pokemon Showdown](play.pokemonshowdown.com). It will collect data on matches played while the program, automatically save replays, and display the match summary history on a web page.
+![image](https://user-images.githubusercontent.com/20196976/183268590-0632fa4b-8444-4a00-9252-2d43c5ef7998.png)
 
 ## How to run
 PS_STATS can be run in the following ways:
