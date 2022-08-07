@@ -30,7 +30,7 @@ NOTE: when running locally, the service cannot be accessed on mobile unless both
 Replit.com is a site which allows you to run code online. Setup is a bit different than running locally. 
 
 - Create an account (or sign in)
-- Create a new repl, and import from github (github.com/malaow3/PS_Stats), set language to Go
+- Create a new repl, and import from github (github.com/malaow3/PS_Stats), set language to Go (optionally, you can fork a repl I have set up: https://replit.com/@malaow3/PSStats )
 - Since repl's are public (unless you chose to pay), we DO NOT want to update the config.yml file, and instead add the relevant data as a secret.
 	- Click the lock icon on the left sidebar and add the following secrets:
 
