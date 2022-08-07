@@ -280,7 +280,16 @@ func Parse_battles() {
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
-			log.Fatal(err)
+			// reconnect if websocket connection is lost
+			log.Error(err)
+			conn, _, err = websocket.DefaultDialer.Dial(
+				"ws://sim3.psim.us/showdown/websocket",
+				nil,
+			)
+			if err != nil {
+				log.Fatal(err)
+			}
+			continue
 		}
 		message_str := string(message)
 
