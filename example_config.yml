@@ -2,3 +2,5 @@
 username: "Example PS Username"
 password: "Example PS password"
 avatar: "misty"
+# Do not edit this field if using replit
+db_path: "./data.db"

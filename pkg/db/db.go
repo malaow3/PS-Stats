@@ -39,7 +39,13 @@ type Battle struct {
 }
 
 func InitDB(cfg *config.Config) {
-	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
+	var dbPath string
+	if cfg.DBPath == "" {
+		dbPath = "./data.db"
+	} else {
+		dbPath = cfg.DBPath
+	}
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
