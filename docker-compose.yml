@@ -9,7 +9,6 @@ services:
       - "1323:1323"
     volumes:
       - ./db:/app/db
-      - ./data.db:/app/db
     logging:
       options:
         max-size: 50m

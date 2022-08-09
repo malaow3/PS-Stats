@@ -3,7 +3,6 @@ WORKDIR /app
 
 COPY ./dist/linux/PS-STATS ./
 COPY ./config.yml ./
-# COPY ./react/public ./react/public
 WORKDIR /app
 
 CMD [ "./PS-STATS" ]
