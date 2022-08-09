@@ -106,3 +106,9 @@ tr:last-of-type td:last-of-type {
 table {
     scrollbar-width: 3px;
 }
+
+.picon {
+    display: inline-block;
+    width: 40px;
+    height: 30px;
+  }

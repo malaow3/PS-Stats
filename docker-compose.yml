@@ -4,13 +4,27 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    depends_on:
-      - "db"
     tty: true
     ports:
       - "1323:1323"
     volumes:
       - ./db:/app/db
+      - ./data.db:/app/db
     logging:
       options:
         max-size: 50m
+    restart: always
+
+  ngrok:
+    image: shkoliar/ngrok:latest
+    tty: true
+    ports:
+      - 4551:4551
+    links:
+      - go
+    environment:
+      - PORT=1323
+      - DOMAIN=go
+      - DEBUG=true
+      - AUTH_TOKEN=<ngrok auth token>
+    restart: always

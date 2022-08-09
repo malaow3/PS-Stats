@@ -1,9 +1,9 @@
 FROM golang:1.17.1-bullseye
 WORKDIR /app
 
-COPY ./main ./
+COPY ./dist/linux/PS-STATS ./
 COPY ./config.yml ./
-COPY ./react/public ./react/public
+# COPY ./react/public ./react/public
 WORKDIR /app
 
-CMD [ "./main" ]
+CMD [ "./PS-STATS" ]

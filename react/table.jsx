@@ -111,45 +111,31 @@ const BattleRow = (props) => {
             <td>
                 <div className="row" style={{marginLeft: teamMargin, alignContent: 'left', textAlign: 'left'}}>
                     {battle.your_team.split(',').map((mon) => {
-                        const monparts = mon.split(' ');
-                        let classMon = monparts[monparts.length - 1];
                         const urlMon = mon.replace(' ', '%20');
-                        if (mon == 'UNKNOWNMON') {
+                        const spanMon = mon.replace('-', '');
+                        const background = Dex.getPokemonIcon(spanMon).split(':')[1];
+                        const spanMonObj = <span
+                            className="picon" style={{
+                                background: background,
+                            }}>
+                        </span>;
+                        if (mon == 'random') {
+                            spanMon.style.opacity= globalOpacity;
                             return (
                                 <div className="col-1" style={{marginRight: '5%'}}>
-                                    <span style={{opacity: globalOpacity}}
-                                        className="sprite-xyitems premier_ball inline-block"
-                                    ></span>
+                                    {spanMonObj}
                                 </div>
                             );
                         } else {
-                            while (
-                                getDefinedCss(classMon) == '' && classMon.split('-').length > 1
-                            ) {
-                            // remove the last part of the name
-                                const parts = classMon.split('-');
-                                parts.pop();
-                                classMon = parts.join('-');
-                            }
-                            if (getDefinedCss(classMon) == '') {
-                                return (
-                                    <div className="col-1" style={{marginRight: '5%'}}>
-                                        <span style={{opacity: globalOpacity}}
-                                            className="sprite-xyitems premier_ball inline-block"
-                                        ></span>
-                                    </div>
-                                );
-                            }
                             let opacity = 1;
                             if (!battle.selected.includes(mon)) {
                                 opacity = globalOpacity;
                             }
                             const url = `https://pikalytics.com/pokedex/ss/${urlMon}`;
-                            const classStr = `sprite-xyicons ${classMon} inline-block`;
                             return (
                                 <div className="col-1" style={{marginRight: '5%', opacity: opacity}}>
                                     <a target="_blank" href={url} rel="noreferrer">
-                                        <span className={classStr}></span>
+                                        {spanMonObj}
                                     </a>
                                 </div>
                             );
@@ -172,45 +158,31 @@ const BattleRow = (props) => {
             <td>
                 <div className="row" style={{marginLeft: teamMargin, alignContent: 'left', textAlign: 'left'}}>
                     {battle.opponent_team.split(',').map((mon) => {
-                        const monparts = mon.split(' ');
-                        let classMon = monparts[monparts.length - 1];
                         const urlMon = mon.replace(' ', '%20');
-                        if (mon == 'UNKNOWNMON') {
+                        const spanMon = mon.replace('-', '');
+                        const background = Dex.getPokemonIcon(spanMon).split(':')[1];
+                        const spanMonObj = <span
+                            className="picon" style={{
+                                background: background,
+                            }}>
+                        </span>;
+                        if (mon == 'random') {
+                            spanMon.style.opacity= globalOpacity;
                             return (
                                 <div className="col-1" style={{marginRight: '5%'}}>
-                                    <span style={{opacity: globalOpacity}}
-                                        className="sprite-xyitems premier_ball inline-block"
-                                    ></span>
+                                    {spanMonObj}
                                 </div>
                             );
                         } else {
-                            while (
-                                getDefinedCss(classMon) == '' && classMon.split('-').length > 1
-                            ) {
-                            // remove the last part of the name
-                                const parts = classMon.split('-');
-                                parts.pop();
-                                classMon = parts.join('-');
-                            }
-                            if (getDefinedCss(classMon) == '') {
-                                return (
-                                    <div className="col-1" style={{marginRight: '5%'}}>
-                                        <span style={{opacity: globalOpacity}}
-                                            className="sprite-xyitems premier_ball inline-block"
-                                        ></span>
-                                    </div>
-                                );
-                            }
                             let opacity = 1;
-                            if (!battle.opponent_selected.includes(mon)) {
+                            if (!battle.selected.includes(mon)) {
                                 opacity = globalOpacity;
                             }
                             const url = `https://pikalytics.com/pokedex/ss/${urlMon}`;
-                            const classStr = `sprite-xyicons ${classMon} inline-block`;
                             return (
                                 <div className="col-1" style={{marginRight: '5%', opacity: opacity}}>
                                     <a target="_blank" href={url} rel="noreferrer">
-                                        <span className={classStr}></span>
+                                        {spanMonObj}
                                     </a>
                                 </div>
                             );

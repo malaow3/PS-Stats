@@ -1,6 +1,8 @@
 package main
 
 import (
+	"embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,7 +10,7 @@ import (
 	"main/pkg/auth"
 	config "main/pkg/dataStructures"
 	"main/pkg/db"
-	battle_parser "main/scripts/battle-parser"
+	battleParser "main/scripts/battleParser"
 	"net/http"
 	"path"
 	"runtime"
@@ -26,7 +28,6 @@ import (
 
 // TO DO:
 // - analytics
-// - hosting with Heroku
 
 // template engine.
 type Template struct {
@@ -54,6 +55,9 @@ func getEchoLoggerNoColors() echologrus.Logrus {
 	return mylog
 }
 
+//go:embed react/*
+var reactDir embed.FS
+
 func main() {
 	trunk.InitLogger()
 	log.Info("Starting up!")
@@ -65,10 +69,6 @@ func main() {
 
 	// create echo webserver
 	e := echo.New()
-	// Setup logger
-	// e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-	// 	Format: "method=${method}, uri=${uri}, status=${status}\n",
-	// }))
 
 	// setup logrus logger
 	echologrus.Logger = log.New()
@@ -78,13 +78,18 @@ func main() {
 	e.Use(middleware.Recover())
 
 	t := &Template{
-		templates: template.Must(template.ParseGlob("react/public/views/*.html")),
+		templates: template.Must(template.ParseFS(reactDir, "react/public/views/*.html")),
 	}
 	e.Renderer = t
-	// expose react/public/css folder
-	e.Static("/favicon", "react/public/favicon")
-	e.Static("/css", "react/public/css")
-	e.Static("/js", "react/public/js")
+	favicon := echo.MustSubFS(reactDir, "react/public/favicon")
+	e.StaticFS("/favicon", favicon)
+	// e.Static("/favicon", "react/public/favicon")
+	css := echo.MustSubFS(reactDir, "react/public/css")
+	e.StaticFS("/css", css)
+	// e.Static("/css", "react/public/css")
+	js := echo.MustSubFS(reactDir, "react/public/js")
+	e.StaticFS("/js", js)
+	// e.Static("/js", "react/public/js")
 
 	// Route to determine if user is logged in
 	e.GET("/api/auth/isloggedin", func(c echo.Context) error {
@@ -303,7 +308,7 @@ func main() {
 	// start the battle parser in the background
 	go func() {
 		log.Info("Starting battle parser")
-		battle_parser.Parse_battles()
+		battleParser.ParseBattles()
 	}()
 
 	// start echo webserver

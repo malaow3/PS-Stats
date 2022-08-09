@@ -1,14 +1,14 @@
-# PS_STATS
+# PS-STATS
 
-PS_STATS is a match tracking tool for [Pokemon Showdown](play.pokemonshowdown.com). It will collect data on matches played while the program, automatically save replays, and display the match summary history on a web page.
+PS-STATS is a match tracking tool for [Pokemon Showdown](play.pokemonshowdown.com). It will collect data on matches played while the program, automatically save replays, and display the match summary history on a web page.
 ![image](https://user-images.githubusercontent.com/20196976/183268590-0632fa4b-8444-4a00-9252-2d43c5ef7998.png)
 
 ## How to run
-PS_STATS can be run in the following ways:
+PS-STATS can be run in the following ways:
 
  - [Locally](#locally)
+	 - [Using Docker (Preferred)](#using-docker)
 	 - [Out of the box](#out-of-the-box)
-	 -  [Using Docker](#using-docker)
 - Hosting
 	- [Replit](#replit)
 
@@ -16,21 +16,31 @@ PS_STATS can be run in the following ways:
 ### Locally
 In order to run locally, the following steps must be followed regardless of method:
 1. Clone the repository to your local machine.
-2. Move the appropriate binary from the dist folder to the top level. 
-	e.g. If you are on macOS you can run the following command `cp dist/mac/PS_STATS .`
-3. The config.yml file must be filled out.
-#### Out of the Box
-If running out of the box, all you need to do is run `PS_STATS` (or `PS_STATS.exe` if on windows). Then navigate to [127.0.0.1:1323](http://127.0.0.1:1323) in a web browser. 
-#### Using Docker
-With docker installed, the command `docker compose up -d --build` can be used to spin up the program.
+2. The config.yml file must be filled out.
 
-NOTE: when running locally, the service cannot be accessed on mobile unless both the device running PS_STATS and the mobile device are on the same WiFi network; If they are, you can navigate to the site on mobile by using your devices local IP address. Additionally a service like [ngrok](https://ngrok.com/) can be used to expose your local instance of the website (however for ease-of-use, I would recommend using the hosting method detailed below unless you are tech-savvy)
+#### Using Docker
+With docker installed, the command `docker compose up -d --build go` can be used to spin up the program. 
+
+If you would like to broadcast your program to be available on other devices (for example, your mobile device), a little more setup must be followed:
+- Create an [ngrok](https://ngrok.com/) account.
+- Copy your auth token into the docker-compose.yml file
+- Run `docker compose up -d --build`
+
+Some notes about ngrok:
+
+- To view the URL for your app, run `docker logs ps_stats-ngrok-1` and look for the line that has a url (e.x: `t=2022-08-09T14:57:20+0000 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://go:1323 url=https://e970-96-234-78-201.ngrok.io`)
+- Note that if your computer shuts down or restarts, when the service is re-started, your ngrok url **will** change and you will need to re-run the above command to view it again.
+- Additionally, most web browsers will flash a warning saying that the ngrok site is "unsafe"; this is because someone could make a clone of something like facebook, host on ngrok, and try to get people to enter real credentials into it; for our use case, this is not a problem, so clicking Details>"visit this unsafe site" is OK. If after viewing the site, you don't see PS-Stats, simply close the tab and double check the URL you entered.
+#### Out of the Box
+First, move the appropriate binary from the dist folder to the top level. 
+	e.g. If you are on macOS you can run the following command `cp dist/mac/PS-STATS .`
+If running out of the box, all you need to do is run `PS-STATS` (or `PS-STATS.exe` if on windows). Then navigate to [127.0.0.1:1323](http://127.0.0.1:1323) in a web browser. 
 
 ### Replit
 Replit.com is a site which allows you to run code online. Setup is a bit different than running locally. 
 
 - Create an account (or sign in)
-- Create a new repl, and import from github (github.com/malaow3/PS_Stats), set language to Go (optionally, you can fork a repl I have set up: https://replit.com/@malaow3/PSStats )
+- Create a new repl, and import from github (github.com/malaow3/PS-Stats), set language to Go (optionally, you can fork a repl I have set up: https://replit.com/@malaow3/PSStats )
 - Since repl's are public (unless you chose to pay), we DO NOT want to update the config.yml file, and instead add the relevant data as a secret.
 	- Click the lock icon on the left sidebar and add the following secrets:
 
