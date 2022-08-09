@@ -175,7 +175,7 @@ const BattleRow = (props) => {
                             );
                         } else {
                             let opacity = 1;
-                            if (!battle.selected.includes(mon)) {
+                            if (!battle.opponent_selected.includes(mon)) {
                                 opacity = globalOpacity;
                             }
                             const url = `https://pikalytics.com/pokedex/ss/${urlMon}`;
