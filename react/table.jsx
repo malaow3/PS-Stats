@@ -117,12 +117,13 @@ const BattleRow = (props) => {
                         const spanMonObj = <span
                             className="picon" style={{
                                 background: background,
+                                opactiy: 1,
                             }}>
                         </span>;
                         if (mon == 'random') {
                             spanMonObj.style.opacity = globalOpacity;
                             return (
-                                <div className="col-1" style={{marginRight: '5%'}}>
+                                <div className="col-1" style={{marginRight: '5%', opacity: globalOpacity}}>
                                     {spanMonObj}
                                 </div>
                             );
@@ -164,12 +165,13 @@ const BattleRow = (props) => {
                         const spanMonObj = <span
                             className="picon" style={{
                                 background: background,
+                                opactiy: 1,
                             }}>
                         </span>;
                         if (mon == 'random') {
                             spanMonObj.style.opacity = globalOpacity;
                             return (
-                                <div className="col-1" style={{marginRight: '5%'}}>
+                                <div className="col-1" style={{marginRight: '5%', opacity: globalOpacity}}>
                                     {spanMonObj}
                                 </div>
                             );
