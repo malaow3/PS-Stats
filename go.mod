@@ -1,20 +1,23 @@
 module main
 
-go 1.17
+go 1.19
 
 require (
+	github.com/alphadose/haxmap v0.1.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/websocket v1.5.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/malaow3/trunk v0.0.0-20220803001732-e1f7cd921681
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tidwall/gjson v1.14.1
+	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/sqlite v1.3.6
 	gorm.io/gorm v1.23.8
 )
 
 require (
+	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/pretty v0.2.0 // indirect

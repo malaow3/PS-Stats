@@ -15,10 +15,12 @@ import (
 
 	config "main/pkg/dataStructures"
 
+	"github.com/alphadose/haxmap"
 	"github.com/gorilla/websocket"
 	"github.com/malaow3/trunk"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"golang.org/x/exp/slices"
 )
 
 func getAssertion(config *config.Config, challstr string) (string, error) {
@@ -73,16 +75,6 @@ type BattleParticipant struct {
 	RatingBefore string
 	RatingAfter  string
 	SelectedMons []string
-}
-
-func contains(slice []string, item string) bool {
-	set := make(map[string]struct{}, len(slice))
-	for _, s := range slice {
-		set[s] = struct{}{}
-	}
-
-	_, ok := set[item]
-	return ok
 }
 
 func login(cfg *config.Config) ([]*http.Cookie, error) {
@@ -187,7 +179,7 @@ func uploadBattle(cfg *config.Config, battle_inst *Battle) error {
 	opponent_team_string := strings.Join(battle_inst.Opponent.SelectedMons, ",")
 	// add the remaining pokemon from FullTeam to your_team_string
 	for _, mon := range battle_inst.Player.FullTeam {
-		if !contains(battle_inst.Player.SelectedMons, mon) {
+		if !slices.Contains(battle_inst.Player.SelectedMons, mon) {
 			mon = strings.TrimSuffix(mon, "-*")
 			your_team_string += "," + mon
 		}
@@ -201,7 +193,7 @@ func uploadBattle(cfg *config.Config, battle_inst *Battle) error {
 	}
 
 	for _, mon := range battle_inst.Opponent.FullTeam {
-		if !contains(battle_inst.Opponent.SelectedMons, mon) {
+		if !slices.Contains(battle_inst.Opponent.SelectedMons, mon) {
 			mon = strings.TrimSuffix(mon, "-*")
 			opponent_team_string += "," + mon
 		}
@@ -277,7 +269,7 @@ func ParseBattles() {
 
 	cfg := config.ParseConfig()
 
-	battles := make(map[string]*Battle)
+	battles := haxmap.New[string, *Battle]()
 
 	for {
 		_, message, err := conn.ReadMessage()
@@ -328,11 +320,15 @@ func ParseBattles() {
 				battle_id_end += "-" + json_data.Get("password").String() + "pw"
 			}
 			battle_id := fmt.Sprintf(">battle-%s", battle_id_end)
-			upload_err := uploadBattle(cfg, battles[battle_id])
+			battle, ok := battles.Get(battle_id)
+			if !ok {
+				continue
+			}
+			upload_err := uploadBattle(cfg, battle)
 			if upload_err != nil {
 				log.Error(upload_err)
 			} else {
-				delete(battles, battle_id)
+				battles.Del(battle_id)
 			}
 
 		}
@@ -367,7 +363,7 @@ func ParseBattles() {
 		if strings.HasPrefix(message_str, ">battle-") {
 			battle_id := strings.Split(message_str, "\n")[0]
 			// create new key if it doesn't exist
-			if _, ok := battles[battle_id]; !ok {
+			if _, ok := battles.Get(battle_id); !ok {
 				format_regex := regexp.MustCompile(`(?m)>battle-(.*?)-`)
 				matches := format_regex.FindStringSubmatch(battle_id)
 				var format string
@@ -376,15 +372,20 @@ func ParseBattles() {
 				} else {
 					format = matches[1]
 				}
-				battles[battle_id] = &Battle{
+				battles.Set(battle_id, &Battle{
 					BattleID:  battle_id,
 					Timestamp: time.Now().Unix(),
 					Format:    format,
 					Player:    &BattleParticipant{},
 					Opponent:  &BattleParticipant{},
-				}
+				})
 			}
 			matches := player_info_regex.FindStringSubmatch(message_str)
+
+			battle, ok := battles.Get(battle_id)
+			if !ok {
+				continue
+			}
 
 			if strings.Contains(message_str, "|player|") {
 				if len(matches) < 3 {
@@ -393,7 +394,7 @@ func ParseBattles() {
 				}
 
 				// if both players are already set, skip any incoming messages
-				if battles[battle_id].Player.Name != "" && battles[battle_id].Opponent.Name != "" {
+				if battle.Player.Name != "" && battle.Opponent.Name != "" {
 					continue
 				}
 				player_name := matches[player_info_regex.SubexpIndex("player_name")]
@@ -401,24 +402,24 @@ func ParseBattles() {
 				player_rating := matches[player_info_regex.SubexpIndex("player_rating")]
 
 				if strings.EqualFold(player_name, cfg.Username) {
-					battles[battle_id].Player = &BattleParticipant{
+					battle.Player = &BattleParticipant{
 						Name:         player_name,
 						RatingBefore: player_rating,
 					}
 					if player_num == "p1" {
-						battles[battle_id].P1 = battles[battle_id].Player
+						battle.P1 = battle.Player
 					} else {
-						battles[battle_id].P2 = battles[battle_id].Player
+						battle.P2 = battle.Player
 					}
 				} else {
-					battles[battle_id].Opponent = &BattleParticipant{
+					battle.Opponent = &BattleParticipant{
 						Name:         player_name,
 						RatingBefore: player_rating,
 					}
 					if player_num == "p1" {
-						battles[battle_id].P1 = battles[battle_id].Opponent
+						battle.P1 = battle.Opponent
 					} else {
-						battles[battle_id].P2 = battles[battle_id].Opponent
+						battle.P2 = battle.Opponent
 					}
 				}
 			}
@@ -428,9 +429,9 @@ func ParseBattles() {
 				player_num := groups[1]
 				poke_name := groups[2]
 				if player_num == "p1" {
-					battles[battle_id].P1.FullTeam = append(battles[battle_id].P1.FullTeam, poke_name)
+					battle.P1.FullTeam = append(battle.P1.FullTeam, poke_name)
 				} else {
-					battles[battle_id].P2.FullTeam = append(battles[battle_id].P2.FullTeam, poke_name)
+					battle.P2.FullTeam = append(battle.P2.FullTeam, poke_name)
 				}
 			}
 
@@ -440,27 +441,27 @@ func ParseBattles() {
 				poke_name := groups[2]
 				if player_num == "p1" {
 					// if pokemon is already in selected mons, skip
-					if contains(battles[battle_id].P1.SelectedMons, poke_name) {
+					if slices.Contains(battle.P1.SelectedMons, poke_name) {
 						continue
 					}
-					battles[battle_id].P1.SelectedMons = append(battles[battle_id].P1.SelectedMons, poke_name)
+					battle.P1.SelectedMons = append(battle.P1.SelectedMons, poke_name)
 					// check to see if there is a pokemon in the full team that needs to be replaced with this one
-					for i, poke_name_in_full_team := range battles[battle_id].P1.FullTeam {
+					for i, poke_name_in_full_team := range battle.P1.FullTeam {
 						if poke_name_in_full_team[len(poke_name_in_full_team)-1:] == "*" &&
 							strings.HasPrefix(poke_name, poke_name_in_full_team[:len(poke_name_in_full_team)-1]) {
-							battles[battle_id].P1.FullTeam[i] = poke_name
+							battle.P1.FullTeam[i] = poke_name
 						}
 					}
 				} else {
-					if contains(battles[battle_id].P2.SelectedMons, poke_name) {
+					if slices.Contains(battle.P2.SelectedMons, poke_name) {
 						continue
 					}
-					battles[battle_id].P2.SelectedMons = append(battles[battle_id].P2.SelectedMons, poke_name)
+					battle.P2.SelectedMons = append(battle.P2.SelectedMons, poke_name)
 					// check to see if there is a pokemon in the full team that needs to be replaced with this one
-					for i, poke_name_in_full_team := range battles[battle_id].P2.FullTeam {
+					for i, poke_name_in_full_team := range battle.P2.FullTeam {
 						if poke_name_in_full_team[len(poke_name_in_full_team)-1:] == "*" &&
 							strings.HasPrefix(poke_name, poke_name_in_full_team[:len(poke_name_in_full_team)-1]) {
-							battles[battle_id].P2.FullTeam[i] = poke_name
+							battle.P2.FullTeam[i] = poke_name
 						}
 					}
 				}
@@ -470,16 +471,16 @@ func ParseBattles() {
 			if len(win_match) > 0 {
 				winner := win_match[1]
 				if strings.EqualFold(winner, cfg.Username) {
-					battles[battle_id].Result = "win"
+					battle.Result = "win"
 				} else {
-					battles[battle_id].Result = "loss"
+					battle.Result = "loss"
 				}
 				message := fmt.Sprintf("%s|/savereplay", battle_id[1:])
 				err = conn.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					log.Error(err)
 				}
-				battles[battle_id].Replay = "https://replay.pokemonshowdown.com/" + battle_id[1:]
+				battle.Replay = "https://replay.pokemonshowdown.com/" + battle_id[1:]
 				// leave the room
 				message = fmt.Sprintf("|/noreply /leave %s", battle_id[1:])
 				err = conn.WriteMessage(websocket.TextMessage, []byte(message))
@@ -493,21 +494,21 @@ func ParseBattles() {
 				player_name := groups[1]
 				rating := groups[2]
 				if strings.EqualFold(player_name, cfg.Username) {
-					battles[battle_id].Player.RatingAfter = rating
+					battle.Player.RatingAfter = rating
 				} else {
-					battles[battle_id].Opponent.RatingAfter = rating
+					battle.Opponent.RatingAfter = rating
 				}
 				// once ratings are set, send a request to update the battle in the database
-				if battles[battle_id].Player.RatingAfter != "" && battles[battle_id].Opponent.RatingAfter != "" {
+				if battle.Player.RatingAfter != "" && battle.Opponent.RatingAfter != "" {
 					// if the rating_before is set, then just update the battle locally
-					if battles[battle_id].Player.RatingBefore != "" && battles[battle_id].Opponent.RatingBefore != "" {
+					if battle.Player.RatingBefore != "" && battle.Opponent.RatingBefore != "" {
 						break
 					}
-					err = updateRating(cfg, battles[battle_id])
+					err = updateRating(cfg, battle)
 					if err != nil {
 						log.Error(err)
 					}
-					delete(battles, battle_id)
+					battles.Del(battle_id)
 				}
 			}
 
