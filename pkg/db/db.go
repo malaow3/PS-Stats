@@ -5,7 +5,7 @@ import (
 	config "main/pkg/dataStructures"
 	"time"
 
-	"gorm.io/driver/sqlite"
+	"github.com/cloudquery/sqlite"
 	"gorm.io/gorm"
 )
 

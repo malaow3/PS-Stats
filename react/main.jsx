@@ -76,19 +76,149 @@ class Main extends React.Component {
      */
     filterBattles(event) {
         // if the event is enter key
+
+        const filterTagsRegex = /(\w*:[\S]*)/gm;
+
         if (event.keyCode === 13 || event == 'TYPINGTIMEOUT') {
             // get the content of the filter search
-            const filterContent = document.getElementById('filter').value;
+            let filterContent = document.getElementById('filter').value;
+            console.log(filterContent);
             // filter battles based on opponent name, opponent team, or your team
-            const filteredBattles = this.state.battles.filter((battle) =>
-                battle.format.toLowerCase().includes(filterContent.toLowerCase()) ||
-                battle.opponent.toLowerCase().includes(filterContent.toLowerCase()) ||
-                battle.opponent_team.toLowerCase().includes(filterContent.toLowerCase()) ||
-                battle.your_team.toLowerCase().includes(filterContent.toLowerCase()),
-            );
+
+            const filterInfo = {
+                opponent_name: null,
+                opponent_team: null,
+                your_team: null,
+                format: null,
+            };
+            let m;
+            while ((m = filterTagsRegex.exec(filterContent)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === filterTagsRegex.lastIndex) {
+                    filterTagsRegex.lastIndex++;
+                }
+
+                // The result can be accessed through the `m`-variable.
+                m.forEach((match, _) => {
+                    console.log('match: ' + match);
+                    if (match.startsWith('opponent:')) {
+                        filterInfo.opponent_name = match.replace('opponent:', '');
+                    } else if (match.startsWith('opponent_team:')) {
+                        filterInfo.opponent_team = match.replace('opponent_team:', '');
+                    } else if (match.startsWith('your_team:')) {
+                        filterInfo.your_team = match.replace('your_team:', '');
+                    } else if (match.startsWith('format:')) {
+                        filterInfo.format = match.replace('format:', '');
+                    }
+                });
+            }
+
+            console.log(filterInfo);
+
+            let filteredBattles = new Set();
+            const formatBattles = new Set();
+            const opponentBattles = new Set();
+            const opponentTeamBattles = new Set();
+            const yourTeamBattles = new Set();
+            if (filterInfo.opponent_name != null) {
+                const tempBattles = this.state.battles.filter((battle) => {
+                    return battle.opponent.toLowerCase().includes(filterInfo.opponent_name.toLowerCase());
+                });
+                tempBattles.forEach((item) => opponentBattles.add(item));
+                // remove the content from the filter search
+                filterContent = filterContent.replace(`opponent:${filterInfo.opponent_name}`, '');
+            }
+            if (filterInfo.opponent_team != null) {
+                const tempBattles = this.state.battles.filter((battle) => {
+                    return battle.opponent_team.toLowerCase().includes(filterInfo.opponent_team.toLowerCase());
+                });
+                tempBattles.forEach((item) => opponentTeamBattles.add(item));
+                filterContent = filterContent.replace(`opponent_team:${filterInfo.opponent_team}`, '');
+            }
+            if (filterInfo.your_team != null) {
+                const tempBattles = this.state.battles.filter((battle) => {
+                    return battle.your_team.toLowerCase().includes(filterInfo.your_team.toLowerCase());
+                });
+                tempBattles.forEach((item) => yourTeamBattles.add(item));
+                filterContent = filterContent.replace(`your_team:${filterInfo.your_team}`, '');
+            }
+            if (filterInfo.format != null) {
+                const tempBattles = this.state.battles.filter((battle) => {
+                    return battle.format.toLowerCase().includes(filterInfo.format.toLowerCase());
+                });
+                tempBattles.forEach((item) => formatBattles.add(item));
+                filterContent = filterContent.replace(`format:${filterInfo.format}`, '');
+            }
+
+            console.log(opponentBattles);
+            console.log(opponentTeamBattles);
+            console.log(yourTeamBattles);
+            console.log(formatBattles);
+
+
+            // set filteredBattles to be the union of all sets
+            if (opponentBattles.size > 0) {
+                filteredBAttles = new Set(opponentBattles);
+            }
+            if (opponentTeamBattles.size > 0) {
+                if (filteredBattles.size > 0) {
+                    // interesct the two sets
+                    filteredBattles = new Set([...filteredBattles].filter((x) => opponentTeamBattles.has(x)));
+                } else {
+                    filteredBattles = new Set(opponentTeamBattles);
+                }
+            }
+            if (yourTeamBattles.size > 0) {
+                if (filteredBattles.size > 0) {
+                    // interesct the two sets
+                    filteredBattles = new Set([...filteredBattles].filter((x) => yourTeamBattles.has(x)));
+                } else {
+                    filteredBattles = new Set(yourTeamBattles);
+                }
+            }
+            if (formatBattles.size > 0) {
+                if (filteredBattles.size > 0) {
+                    // interesct the two sets
+                    filteredBattles = new Set([...filteredBattles].filter((x) => formatBattles.has(x)));
+                } else {
+                    filteredBattles = new Set(formatBattles);
+                }
+            }
+            console.log(filteredBattles);
+            // strip filter content
+            filterContent = filterContent.trim();
+            if (filterContent != '') {
+                // for each item in the filter input, filter the battles
+                const filterItems = filterContent.split(' ');
+                for (let i = 0; i < filterItems.length; i++) {
+                    const tempBattles = this.state.battles.filter((battle) => {
+                        return battle.opponent.toLowerCase().includes(filterItems[i].toLowerCase()) ||
+                            battle.opponent_team.toLowerCase().includes(filterItems[i].toLowerCase()) ||
+                            battle.your_team.toLowerCase().includes(filterItems[i].toLowerCase()) ||
+                            battle.format.toLowerCase().includes(filterItems[i].toLowerCase());
+                    });
+                    tempBattles.forEach((item) => filteredBattles.add(item));
+                }
+            }
+
+            // filteredBattles = this.state.battles.filter((battle) =>
+            //     battle.format.toLowerCase().includes(filterContent.toLowerCase()) ||
+            //     battle.opponent.toLowerCase().includes(filterContent.toLowerCase()) ||
+            //     battle.opponent_team.toLowerCase().includes(filterContent.toLowerCase()) ||
+            //     battle.your_team.toLowerCase().includes(filterContent.toLowerCase()),
+            // );
             // set the state to the filtered battles
+            let totalPages = Math.ceil(filteredBattles.size / pageSize);
+            if (totalPages === 0) {
+                totalPages = 1;
+            }
+
+            console.log('totalPages: ' + totalPages);
+            console.log(filteredBattles);
+
             this.setState({
-                filter_battles: filteredBattles,
+                filter_battles: Array.from(filteredBattles),
+                totalPages: totalPages,
             });
         }
     }
@@ -97,19 +227,25 @@ class Main extends React.Component {
      * Delete selected entries, if deleteAll is true, delete all entries
      * @param {boolean} deleteAll
      */
-    async deleteEntries(deleteAll = false) {
+    async deleteEntries(deleteAll) {
         // find all checkboxes that are checked
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         // if delete all, get all rows of the table
         let rows = [];
+        let battleIds = [];
+        console.log(deleteAll);
         if (deleteAll) {
-            rows = document.querySelectorAll('tr');
+            console.log('delete all');
+            for (let i = 0; i < this.state.battles.length; i++) {
+                battleIds.push(this.state.battles[i].battle_id);
+            }
+            console.log(battleIds);
         } else {
             // otherwise, get only the rows that are checked
             rows = Array.from(checkboxes).map((checkbox) => checkbox.parentNode.parentNode);
+            // get the battle id from the key of the row
+            battleIds = Array.from(rows).map((row) => row.getAttribute('data-id'));
         }
-        // get the battle id from the key of the row
-        const battleIds = Array.from(rows).map((row) => row.getAttribute('data-id'));
 
         // send POST request to server
         const data = {'battle_ids': battleIds};
@@ -558,7 +694,7 @@ class Main extends React.Component {
                             style={{width: '100%'}}
                             className="btn btn-light"
                             onClick={() => {
-                                this.deleteEntries();
+                                this.deleteEntries(true);
                             }}
                         >
                             Clear All Entries
@@ -569,7 +705,7 @@ class Main extends React.Component {
                             style={{width: '100%'}}
                             className="btn btn-light"
                             onClick={() => {
-                                this.deleteEntries();
+                                this.deleteEntries(false);
                             }}
                         >
                             Delete Selected Entries
@@ -632,7 +768,7 @@ class Main extends React.Component {
                                 style={{width: '100%'}}
                                 className="btn btn-light"
                                 onClick={() => {
-                                    this.deleteEntries();
+                                    this.deleteEntries(true);
                                 }}
                             >
                             Clear All Entries
@@ -645,7 +781,7 @@ class Main extends React.Component {
                                 style={{width: '100%'}}
                                 className="btn btn-light"
                                 onClick={() => {
-                                    this.deleteEntries();
+                                    this.deleteEntries(false);
                                 }}
                             >
                             Delete Selected Entries

@@ -249,7 +249,7 @@ func ParseBattles() {
 	log.Info("Starting battle parser")
 
 	player_info_regex := regexp.MustCompile(`(?m)\|player\|(?P<player_num>p\d)\|(?P<player_name>.*?)\|.*\|(?P<player_rating>\d*)\n?`)
-	poke_regex := regexp.MustCompile(`(?m)\|poke\|(p\d)\|(.*?),.*\|`)
+	poke_regex := regexp.MustCompile(`(?m)\|poke\|(p\d)\|(.*?)(?:,.*)?\|`)
 	switch_regex := regexp.MustCompile(`(?m)\|switch\|(p\d)\w: .*\|(.*?),`)
 	win_regex := regexp.MustCompile(`(?m)\|win\|(.*)\n?`)
 	rating_regex := regexp.MustCompile(`(?m)\|raw\|(.*?)'s rating: \d+ &rarr; <strong>(\d+)`)
