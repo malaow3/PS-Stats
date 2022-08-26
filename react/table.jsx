@@ -113,7 +113,7 @@ const BattleRow = (props) => {
                     {battle.your_team.split(',').map((mon) => {
                         const urlMon = mon.replace(' ', '%20');
                         const spanMon = mon.replace('-', '');
-                        const background = Dex.getPokemonIcon(spanMon).split(':')[1];
+                        const background = Dex.getPokemonIcon(spanMon).substring('background:'.length);
                         const spanMonObj = <span
                             className="picon" style={{
                                 background: background,
@@ -160,7 +160,7 @@ const BattleRow = (props) => {
                     {battle.opponent_team.split(',').map((mon) => {
                         const urlMon = mon.replace(' ', '%20');
                         const spanMon = mon.replace('-', '');
-                        const background = Dex.getPokemonIcon(spanMon).split(':')[1];
+                        const background = Dex.getPokemonIcon(spanMon).substring('background:'.length);
                         const spanMonObj = <span
                             className="picon" style={{
                                 background: background,

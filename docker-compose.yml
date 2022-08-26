@@ -14,16 +14,13 @@ services:
         max-size: 50m
     restart: always
 
-  ngrok:
-    image: shkoliar/ngrok:latest
+  localtunnel:
+    build:
+      context: .
+      dockerfile: dockerfile-serve
+    restart: on-failure
     tty: true
-    ports:
-      - 4551:4551
+    depends_on:
+      - go
     links:
       - go
-    environment:
-      - PORT=1323
-      - DOMAIN=go
-      - DEBUG=true
-      - AUTH_TOKEN=<ngrok auth token>
-    restart: always
