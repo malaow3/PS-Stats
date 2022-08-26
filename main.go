@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"os"
 
 	"encoding/json"
 	"errors"
@@ -312,5 +313,9 @@ func main() {
 	}()
 
 	// start echo webserver
-	e.Logger.Fatal(e.Start(":1323"))
+	if os.Getenv("DEPLOY") == "TRUE" {
+		e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	} else {
+		e.Logger.Fatal(e.Start(":1323"))
+	}
 }
