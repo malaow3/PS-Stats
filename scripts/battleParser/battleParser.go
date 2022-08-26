@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -78,7 +79,12 @@ type BattleParticipant struct {
 }
 
 func login(cfg *config.Config) ([]*http.Cookie, error) {
-	url := "http://127.0.0.1:1323/api/auth/login"
+	var url string
+	if os.Getenv("PORT") == "" {
+		url = "http://127.0.0.1:1323/api/auth/login"
+	} else {
+		url = fmt.Sprintf("http://127.0.0.1:%s/api/auth/login", os.Getenv("PORT"))
+	}
 	method := "POST"
 	type Payload struct {
 		Username string `json:"username"`
@@ -132,8 +138,13 @@ func updateRating(cfg *config.Config, battle_inst *Battle) error {
 		return err
 	}
 	body := bytes.NewReader(payloadBytes)
-
-	req, err := http.NewRequest("POST", "http://127.0.0.1:1323/api/battle_update", body)
+	var url string
+	if os.Getenv("PORT") == "" {
+		url = "http://127.0.0.1:1323/api/battle_update"
+	} else {
+		url = fmt.Sprintf("http://127.0.0.1:%s/api/battle_update", os.Getenv("PORT"))
+	}
+	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return err
 	}
@@ -229,8 +240,13 @@ func uploadBattle(cfg *config.Config, battle_inst *Battle) error {
 		return err
 	}
 	body := bytes.NewReader(payloadBytes)
-
-	req, err := http.NewRequest("POST", "http://127.0.0.1:1323/api/battle", body)
+	var url string
+	if os.Getenv("PORT") == "" {
+		url = "http://127.0.0.1:1323/api/battle"
+	} else {
+		url = fmt.Sprintf("http://127.0.0.1:%s/api/battle", os.Getenv("PORT"))
+	}
+	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return err
 	}
