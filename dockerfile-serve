@@ -1,2 +1,0 @@
-FROM node:alpine
-CMD [ "npx", "--yes", "localtunnel", "--local-host", "go", "--port", "1323", "--subdomain", "example-subdomain"]
